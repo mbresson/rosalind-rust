@@ -3,6 +3,7 @@ use std::io;
 use std::fs;
 use std::io::Read;
 
+
 /// Returns the contents of the file as a String.
 ///
 /// # Examples

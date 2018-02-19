@@ -2,8 +2,6 @@ extern crate rosalind;
 
 // solution to http://rosalind.info/problems/gc/
 
-const FILENAME: &'static str = "data/computing-gc-content.txt";
-
 #[cfg(test)]
 mod tests {
     #[test]
@@ -29,8 +27,7 @@ fn compute_gc_content(sequence: &str) -> Result<f64, String> {
 }
 
 fn main() {
-    let fasta_content =
-        rosalind::io::load_file_to_string(FILENAME).expect("Couldn't open the file");
+    let fasta_content = rosalind::io::load_data(file!()).expect("Couldn't open the file");
 
     let sequences = rosalind::fasta::parse_fasta_format_to_map(&fasta_content)
         .expect("Couldn't parse FASTA data");

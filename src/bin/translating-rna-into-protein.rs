@@ -1,11 +1,8 @@
-
 extern crate rosalind;
 
 use std::fmt;
 
 // solution to http://rosalind.info/problems/prot/
-
-const FILENAME: &'static str = "data/translating-dna-into-protein.txt";
 
 #[cfg(test)]
 mod tests {
@@ -68,7 +65,7 @@ impl fmt::Display for AminoAcid {
             Threonine => "T",
             Tryptophan => "W",
             Tyrosine => "Y",
-            Valine => "V", 
+            Valine => "V",
         };
 
         write!(f, "{}", repr)
@@ -160,8 +157,7 @@ fn amino_acids_from_rna(rna: &str) -> Result<Vec<AminoAcid>, String> {
 }
 
 fn main() {
-    let messenger_rna =
-        rosalind::io::load_file_to_string(FILENAME).expect("Couldn't open the file");
+    let messenger_rna = rosalind::io::load_data(file!()).expect("Couldn't open the file");
 
     println!("RNA string: {}", messenger_rna);
 

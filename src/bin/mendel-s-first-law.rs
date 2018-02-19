@@ -2,8 +2,6 @@ extern crate rosalind;
 
 // solution to http://rosalind.info/problems/iprb/
 
-const FILENAME: &'static str = "data/mendel-s-first-law.txt";
-
 #[cfg(test)]
 mod tests {
     #[test]
@@ -187,7 +185,7 @@ fn compute_probability_of_producing_dominant_allele(k_i: u32, m_i: u32, n_i: u32
 }
 
 fn main() {
-    let dataset = rosalind::io::load_file_to_string(FILENAME).expect("Couldn't open the file");
+    let dataset = rosalind::io::load_data(file!()).expect("Couldn't open the file");
 
     let (k_homozygous_dominant, m_heterozygous, n_homozygous_recessive) =
         dataset_to_a_b_c_numbers(&dataset).expect("Couldn't parse the file");

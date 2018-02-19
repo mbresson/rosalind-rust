@@ -1,9 +1,6 @@
-
 extern crate rosalind;
 
 // solution to http://rosalind.info/problems/fib/
-
-const FILENAME: &'static str = "data/rabbits-and-recurrence-relations.txt";
 
 #[cfg(test)]
 mod tests {
@@ -67,7 +64,7 @@ fn dataset_to_n_months_and_k_new_pairs(dataset: &str) -> Result<(u64, u64), Stri
 }
 
 fn main() {
-    let dataset = rosalind::io::load_file_to_string(FILENAME).expect("Couldn't open the file");
+    let dataset = rosalind::io::load_data(file!()).expect("Couldn't open the file");
 
     let (n_months, k_new_pairs) =
         dataset_to_n_months_and_k_new_pairs(&dataset).expect("Couldn't parse the file");

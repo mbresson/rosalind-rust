@@ -2,8 +2,6 @@ extern crate rosalind;
 
 // solution to http://rosalind.info/problems/hamm/
 
-const FILENAME: &'static str = "data/counting-point-mutations.txt";
-
 #[cfg(test)]
 mod tests {
     #[test]
@@ -48,7 +46,7 @@ fn count_point_mutations(dna_strand_a: &str, dna_strand_b: &str) -> u32 {
 }
 
 fn main() {
-    let content = rosalind::io::load_file_to_string(FILENAME).expect("Couldn't open the file");
+    let content = rosalind::io::load_data(file!()).expect("Couldn't open the file");
 
     let dna_strings = content.lines().collect::<Vec<&str>>();
 

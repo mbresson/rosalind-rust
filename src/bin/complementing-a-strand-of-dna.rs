@@ -1,11 +1,8 @@
-
 extern crate rosalind;
 
 use rosalind::Nucleobase;
 
 // solution to http://rosalind.info/problems/revc/
-
-const FILENAME: &'static str = "data/complementing-a-strand-of-dna.txt";
 
 #[cfg(test)]
 mod tests {
@@ -13,14 +10,15 @@ mod tests {
     fn reverse_complement_dna_strand() {
         let strand = "AAAACCCGGT";
 
-        let complemented_strand = ::reverse_complement_dna_strand(&strand).expect("Error reversing and complementing the strand!");
+        let complemented_strand = ::reverse_complement_dna_strand(&strand)
+            .expect("Error reversing and complementing the strand!");
 
         assert_eq!(complemented_strand, "ACCGGGTTTT");
     }
 }
 
 fn base_complement(base: Nucleobase) -> Result<Nucleobase, String> {
-    use rosalind::{ADENYNE, THYMINE, CYTOSINE, GUANINE};
+    use rosalind::{ADENYNE, CYTOSINE, GUANINE, THYMINE};
 
     match base {
         ADENYNE => Ok(THYMINE),
@@ -32,19 +30,16 @@ fn base_complement(base: Nucleobase) -> Result<Nucleobase, String> {
 }
 
 fn reverse_complement_dna_strand(strand: &str) -> Result<String, String> {
-    strand
-        .chars()
-        .rev()
-        .map(base_complement)
-        .collect()
+    strand.chars().rev().map(base_complement).collect()
 }
 
 fn main() {
-    let dna_strand = rosalind::io::load_file_to_string(FILENAME).expect("Couldn't open the file");
+    let dna_strand = rosalind::io::load_data(file!()).expect("Couldn't open the file");
 
     println!("DNA strand: {}", dna_strand);
 
-    let complemented_strand = reverse_complement_dna_strand(&dna_strand).expect("Error complementing DNA strand!");
+    let complemented_strand =
+        reverse_complement_dna_strand(&dna_strand).expect("Error complementing DNA strand!");
 
     println!("Reverse complement: {}", complemented_strand);
 }

@@ -1,9 +1,6 @@
-
 extern crate rosalind;
 
 // solution to http://rosalind.info/problems/rna/
-
-const FILENAME: &'static str = "data/transcribing-dna-into-rna.txt";
 
 #[cfg(test)]
 mod tests {
@@ -29,7 +26,7 @@ mod tests {
 }
 
 fn dna_base_to_rna_base(base: char) -> Result<char, String> {
-    use rosalind::{ADENYNE, THYMINE, CYTOSINE, GUANINE, URACIL};
+    use rosalind::{ADENYNE, CYTOSINE, GUANINE, THYMINE, URACIL};
 
     match base {
         THYMINE => Ok(URACIL),
@@ -45,7 +42,7 @@ fn dna_to_rna(dna: &str) -> Result<String, String> {
 }
 
 fn main() {
-    let dna = rosalind::io::load_file_to_string(FILENAME).expect("Couldn't open the file");
+    let dna = rosalind::io::load_data(file!()).expect("Couldn't open the file");
 
     println!("DNA string: {}", dna);
 

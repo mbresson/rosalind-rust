@@ -2,10 +2,8 @@ extern crate rosalind;
 
 // solution to http://rosalind.info/problems/dna/
 
-const FILENAME: &'static str = "data/counting-dna-nucleotides.txt";
-
 fn main() {
-    let dna = rosalind::io::load_file_to_string(FILENAME).expect("Couldn't open the file");
+    let dna = rosalind::io::load_data(file!()).expect("Couldn't open the file");
 
     println!("DNA string: {}", dna);
 

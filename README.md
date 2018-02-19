@@ -11,6 +11,25 @@ cargo test
 
 ## Run it
 
+### Run a single file
+
+```bash
+cargo run --bin filename-without-rs
+```
+
+Example:
+
+```bash
+cargo run --bin finding-a-motif-in-dna
+```
+
+### Run them all
+
+One Script to rule them all,
+One Script to find them,
+One Script to bring them all,
+And in the unix-ness run them.
+
 ```bash
 for bin in ./src/bin/*.rs; do
 	cargo run --bin $(basename "${bin%.rs}")

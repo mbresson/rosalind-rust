@@ -63,6 +63,21 @@ TGGGAACCTGCGGGCAGTAGGTGGAAT
     }
 }
 
+/// Returns the contents of the FASTA file as a map where keys are sequence labels and values are the corresponding sequences.
+///
+/// # Examples
+///
+/// ```
+/// let fasta_text = r"
+/// >Sequence 1
+/// AAATTTCGAGATCCA
+/// ";
+///
+/// match rosalind::fasta::parse_fasta_format_to_map(fasta_text) {
+///     Ok(contents) => println!("FASTA data: {:?}", contents),
+///     Err(parsing_error) => panic!("The data couldn't be parsed: {}", parsing_error),
+/// }
+/// ```
 pub fn parse_fasta_format_to_map(fasta_content: &str) -> Result<HashMap<Label, Sequence>, String> {
     let mut data = HashMap::new();
 

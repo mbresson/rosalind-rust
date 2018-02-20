@@ -36,7 +36,21 @@ mod tests {
     }
 }
 
-// returns the number of (adenyne, thymine, cytosine, guanine) nucleotides in the DNA string
+/// Returns the number of (adenyne, thymine, cytosine, guanine) nucleotides in the `dna` string.
+///
+/// # Examples
+///
+/// ```
+/// match rosalind::count_nucleotides("AATAGGCTA") {
+///     Ok((a, t, c, g)) => {
+///         println!(
+///             "Adenine: {}\nThymine: {}\nCytosine: {}\nGuanine: {}",
+///             a, t, c, g
+///         );
+///     }
+///     Err(error) => println!("Couldn't count nucleotides: {}", error),
+/// }
+/// ```
 pub fn count_nucleotides(dna: &str) -> Result<(u32, u32, u32, u32), String> {
     let (mut adenyne, mut thymine, mut cytosine, mut guanine) = (0u32, 0u32, 0u32, 0u32);
 

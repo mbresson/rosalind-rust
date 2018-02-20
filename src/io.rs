@@ -39,6 +39,17 @@ pub fn load_file_to_string(filename: &str) -> io::Result<String> {
     Ok(buffer)
 }
 
+/// Returns the contents of the file located under the data/ directory
+/// whose filename (excluding the .txt extension) is the same as `main_file` without extension.
+///
+/// # Examples
+///
+/// ```
+/// match rosalind::io::load_data("test_file.rs") {
+///     Ok(contents) => println!("The content of the data file is {}", contents),
+///     Err(file_error) => panic!("The data file couldn't be read: {}", file_error),
+/// }
+/// ```
 pub fn load_data(main_file: &str) -> io::Result<String> {
     load_file_to_string(&data_file_path(main_file))
 }

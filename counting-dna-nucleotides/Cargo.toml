@@ -1,6 +1,0 @@
-[package]
-name = "counting-dna-nucleotides"
-version = "0.1.0"
-authors = ["Matthieu Bresson <matthieu.bresson@outlook.com>"]
-
-[dependencies]

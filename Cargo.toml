@@ -2,6 +2,7 @@
 name = "rosalind"
 version = "0.1.0"
 authors = ["Matthieu Bresson <matthieu.bresson@outlook.com>"]
+license = "MIT"
 
 [dependencies]
 num-bigint = "0.1"

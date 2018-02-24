@@ -45,7 +45,9 @@ pub fn load_file_to_string(filename: &str) -> io::Result<String> {
     let mut buffer = String::new();
     file.read_to_string(&mut buffer)?;
 
-    trim_string(&mut buffer);
+    let len_without_trailing_whitespace = buffer.trim_right().len();
+
+    buffer.truncate(len_without_trailing_whitespace);
 
     Ok(buffer)
 }
@@ -82,13 +84,6 @@ pub fn parse_separated_values<F: FromStr>(
         .split(separator)
         .map(|raw_value| raw_value.parse::<F>())
         .collect::<Result<Vec<F>, _>>()
-}
-
-// removes trailing white spaces and newline characters
-fn trim_string(s: &mut String) {
-    let len_without_trailing_whitespace = s.trim_right().len();
-
-    s.truncate(len_without_trailing_whitespace);
 }
 
 // returns the path to the data file that has the same name as `main_file`

@@ -1,8 +1,8 @@
 extern crate num_bigint;
 extern crate rosalind;
 
-use std::str::FromStr;
 use num_bigint::{BigUint, ToBigUint};
+use rosalind::io::parse_separated_values;
 
 // solution to http://rosalind.info/problems/fibd/
 
@@ -39,17 +39,6 @@ mod tests {
 
         assert_eq!(rabbit_pairs, 1_i32.to_biguint().unwrap());
     }
-}
-
-// parse an arbitrary number of values from `values_string` separated by `separator`
-fn parse_separated_values<F: FromStr>(
-    values_string: &str,
-    separator: &str,
-) -> Result<Vec<F>, F::Err> {
-    values_string
-        .split(separator)
-        .map(|raw_value| raw_value.parse::<F>())
-        .collect::<Result<Vec<F>, _>>()
 }
 
 fn step_rabbit_pairs_population(population: &Vec<BigUint>) -> Vec<BigUint> {

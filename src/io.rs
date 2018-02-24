@@ -1,6 +1,7 @@
 use std::io;
 use std::fs;
 use std::io::Read;
+use std::str::FromStr;
 
 #[cfg(test)]
 mod tests {
@@ -52,6 +53,25 @@ pub fn load_file_to_string(filename: &str) -> io::Result<String> {
 /// ```
 pub fn load_data(main_file: &str) -> io::Result<String> {
     load_file_to_string(&data_file_path(main_file))
+}
+
+/// Parses an arbitrary number of values from `values_string` separated by `separator`.
+///
+/// # Examples
+///
+/// ```
+/// let values = rosalind::io::parse_separated_values::<u32>("1, 2, 3, 4, 5", ", ").expect("Couldn't parse values");
+///
+/// assert_eq!(values, vec![1, 2, 3, 4, 5]);
+/// ```
+pub fn parse_separated_values<F: FromStr>(
+    values_string: &str,
+    separator: &str,
+) -> Result<Vec<F>, F::Err> {
+    values_string
+        .split(separator)
+        .map(|raw_value| raw_value.parse::<F>())
+        .collect::<Result<Vec<F>, _>>()
 }
 
 // removes trailing white spaces and newline characters

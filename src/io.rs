@@ -91,7 +91,7 @@ pub fn parse_separated_values<F: FromStr>(
 fn data_file_path(main_file: &str) -> String {
     let file_without_extension = main_file.trim_right_matches(".rs");
 
-    let file_name_only = match file_without_extension.rfind("/") {
+    let file_name_only = match file_without_extension.rfind('/') {
         Some(index) => &file_without_extension[index + 1..],
         None => file_without_extension,
     };

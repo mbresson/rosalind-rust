@@ -22,7 +22,7 @@ TGGGAACCTGCGGGCAGTAGGTGGAAT
 ";
 
         let fasta_data =
-            ::fasta::parse_fasta_format_to_map(&raw_data).expect("Error parsing FASTA data!");
+            ::fasta::parse_fasta_format_to_map(raw_data).expect("Error parsing FASTA data!");
 
         let expected_data: HashMap<::fasta::Label, ::fasta::Sequence> = [
             ("Rosalind_6404".to_string(), "CCTGCGGAAGATCGGCACTAGAATAGCCAGAACCGTTTCTCTGAGGCTTCCGGCCTTCCCTCCCACTAATAATTCTGAGG".to_string()),
@@ -59,7 +59,7 @@ CCACCCTCGTGGTATGGCTAGGCATTCAGGAACCGGAGAACGCTTCAGACCAGCCCGGAC
 TGGGAACCTGCGGGCAGTAGGTGGAAT
 ";
 
-        assert!(::fasta::parse_fasta_format_to_map(&raw_data).is_err());
+        assert!(::fasta::parse_fasta_format_to_map(raw_data).is_err());
     }
 }
 
@@ -89,7 +89,7 @@ pub fn parse_fasta_format_to_map(fasta_content: &str) -> Result<HashMap<Label, S
     let mut current_label_and_sequence: Option<(Label, Sequence)> = None;
 
     for line in meaningful_lines {
-        let is_new_sequence = line.starts_with(">");
+        let is_new_sequence = line.starts_with('>');
 
         if is_new_sequence {
             if let Some((label, sequence)) = current_label_and_sequence {

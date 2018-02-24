@@ -17,7 +17,7 @@ mod tests {
         let dna = "AGCTTTTCATTCTGACTGCAACGGGCAATATGTCTCTGTGTGGATTAAAAAAAGAGTGTCTGATAGCAGC";
 
         let (nb_adenyne, nb_thymine, nb_cytosine, nb_guanine) =
-            ::count_nucleotides(&dna).expect("Couldn't count nucleotides!");
+            ::count_nucleotides(dna).expect("Couldn't count nucleotides!");
 
         assert_eq!(nb_adenyne, 20);
         assert_eq!(nb_cytosine, 12);

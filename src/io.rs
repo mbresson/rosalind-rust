@@ -18,6 +18,16 @@ mod tests {
 
         assert_eq!(::io::data_file_path(main_file), "data/hello-world.txt");
     }
+
+    #[test]
+    fn parse_separated_values() {
+        let string = "1 and 42 and 6788";
+
+        assert_eq!(
+            ::io::parse_separated_values::<u32>(string, " and ").expect("Couldn't parse values!"),
+            vec![1, 42, 6788]
+        );
+    }
 }
 
 /// Returns the contents of the file as a String.

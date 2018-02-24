@@ -1,5 +1,6 @@
 pub mod io;
 pub mod fasta;
+pub mod probabilities;
 
 pub type Nucleobase = char;
 

@@ -46,8 +46,8 @@ fn find_longest_common_substring<'a>(sequences_map: &'a HashMap<Label, Sequence>
 
     let mut sequences_iter = sequences_map.iter().map(|(_, sequence)| &sequence[..]);
 
-    let first_sequence = sequences_iter.next().unwrap_or("");
-    let sequences = sequences_iter.collect::<Vec<&'a str>>();
+    let first_sequence = sequences_iter.next().unwrap();
+    let sequences = sequences_iter.collect::<Vec<_>>();
 
     let mut ch_index = 0;
 

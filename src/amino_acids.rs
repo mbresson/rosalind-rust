@@ -1,6 +1,7 @@
 use std::fmt;
 use std::error;
 
+#[derive(PartialEq)]
 pub enum AminoAcid {
     Alanine,
     Arginine,

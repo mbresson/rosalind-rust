@@ -36,6 +36,16 @@ mod tests {
             "Unknown nucleobase should return an Error"
         );
     }
+
+    #[test]
+    fn reverse_complement_dna_strand() {
+        let strand = "AAAACCCGGT";
+
+        let complemented_strand = ::reverse_complement_dna_strand(&strand)
+            .expect("Error reversing and complementing the strand!");
+
+        assert_eq!(complemented_strand, "ACCGGGTTTT");
+    }
 }
 
 /// Returns the number of (adenyne, thymine, cytosine, guanine) nucleotides in the `dna` string.
@@ -67,4 +77,18 @@ pub fn count_nucleotides(dna: &str) -> Result<(u32, u32, u32, u32), String> {
     }
 
     Ok((adenyne, thymine, cytosine, guanine))
+}
+
+fn base_complement(base: Nucleobase) -> Result<Nucleobase, String> {
+    match base {
+        ADENYNE => Ok(THYMINE),
+        THYMINE => Ok(ADENYNE),
+        CYTOSINE => Ok(GUANINE),
+        GUANINE => Ok(CYTOSINE),
+        _ => Err(format!("Unexpected nucleobase: {}", base)),
+    }
+}
+
+pub fn reverse_complement_dna_strand(strand: &str) -> Result<String, String> {
+    strand.chars().rev().map(base_complement).collect()
 }

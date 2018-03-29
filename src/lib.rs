@@ -92,3 +92,31 @@ fn base_complement(base: Nucleobase) -> Result<Nucleobase, String> {
 pub fn reverse_complement_dna_strand(strand: &str) -> Result<String, String> {
     strand.chars().rev().map(base_complement).collect()
 }
+
+// CodonIterator iterates over all the codons of a RNA string
+// a codon is a group of 3 nucleobases
+// if the length of the RNA string is not a multiple of 3, the remaining bases are skipped
+pub struct CodonIterator<'a> {
+    rna: &'a str,
+    index: usize,
+}
+
+impl<'a> CodonIterator<'a> {
+    pub fn new(rna: &'a str) -> CodonIterator {
+        CodonIterator { rna, index: 0 }
+    }
+}
+
+impl<'a> Iterator for CodonIterator<'a> {
+    type Item = &'a str;
+
+    fn next(&mut self) -> Option<Self::Item> {
+        self.index += 3;
+
+        if self.index > self.rna.len() {
+            None
+        } else {
+            Some(&self.rna[self.index - 3..self.index])
+        }
+    }
+}

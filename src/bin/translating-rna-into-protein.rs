@@ -31,40 +31,12 @@ impl fmt::Display for AminoAcidString {
     }
 }
 
-// CodonIterator iterates over all the codons of a RNA string
-// a codon is a group of 3 nucleobases
-// if the length of the RNA string is not a multiple of 3, the remaining bases are skipped
-struct CodonIterator<'a> {
-    rna: &'a str,
-    index: usize,
-}
-
-impl<'a> CodonIterator<'a> {
-    fn new(rna: &'a str) -> CodonIterator {
-        CodonIterator { rna, index: 0 }
-    }
-}
-
-impl<'a> Iterator for CodonIterator<'a> {
-    type Item = &'a str;
-
-    fn next(&mut self) -> Option<Self::Item> {
-        self.index += 3;
-
-        if self.index > self.rna.len() {
-            None
-        } else {
-            Some(&self.rna[self.index - 3..self.index])
-        }
-    }
-}
-
 fn amino_acids_from_rna(rna: &str) -> Result<Vec<AminoAcid>, String> {
     use AminoAcid::*;
 
     let mut amino_acids = Vec::new();
 
-    for codon in CodonIterator::new(rna) {
+    for codon in rosalind::CodonIterator::new(rna) {
         let amino_acid = match codon {
             "UUU" | "UUC" => Phenyalalanine,
             "UUA" | "UUG" | "CUU" | "CUC" | "CUA" | "CUG" => Leucine,

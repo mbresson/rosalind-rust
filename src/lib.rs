@@ -120,3 +120,17 @@ impl<'a> Iterator for CodonIterator<'a> {
         }
     }
 }
+
+fn dna_base_to_rna_base(base: char) -> Result<char, String> {
+    match base {
+        THYMINE => Ok(URACIL),
+        ADENYNE | CYTOSINE | GUANINE => Ok(base),
+        _ => Err(format!("Unexpected nucleobase: {}", base)),
+    }
+}
+
+pub fn dna_to_rna(dna: &str) -> Result<String, String> {
+    dna.chars()
+        .map(|base: char| dna_base_to_rna_base(base))
+        .collect()
+}

@@ -4,11 +4,13 @@ extern crate rosalind;
 
 #[cfg(test)]
 mod tests {
+    extern crate rosalind;
+
     #[test]
     fn dna_to_rna() {
         let dna = "GATGGAACTTGACTACGTAAATT";
 
-        let rna = ::dna_to_rna(dna).expect("Couldn't transcribe DNA to RNA!");
+        let rna = rosalind::dna_to_rna(dna).expect("Couldn't transcribe DNA to RNA!");
 
         assert_eq!(rna, "GAUGGAACUUGACUACGUAAAUU");
     }
@@ -19,26 +21,10 @@ mod tests {
         //                 (?)
 
         assert!(
-            ::dna_to_rna(dna).is_err(),
+            rosalind::dna_to_rna(dna).is_err(),
             "Unknown nucleobase should return an Error"
         );
     }
-}
-
-fn dna_base_to_rna_base(base: char) -> Result<char, String> {
-    use rosalind::{ADENYNE, CYTOSINE, GUANINE, THYMINE, URACIL};
-
-    match base {
-        THYMINE => Ok(URACIL),
-        ADENYNE | CYTOSINE | GUANINE => Ok(base),
-        _ => Err(format!("Unexpected nucleobase: {}", base)),
-    }
-}
-
-fn dna_to_rna(dna: &str) -> Result<String, String> {
-    dna.chars()
-        .map(|base: char| dna_base_to_rna_base(base))
-        .collect()
 }
 
 fn main() {
@@ -46,7 +32,7 @@ fn main() {
 
     println!("DNA string: {}", dna);
 
-    let rna = dna_to_rna(&dna).expect("Error transcribing DNA to RNA!");
+    let rna = rosalind::dna_to_rna(&dna).expect("Error transcribing DNA to RNA!");
 
     println!("RNA string: {}", rna);
 }

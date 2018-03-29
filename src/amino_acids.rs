@@ -106,3 +106,47 @@ impl fmt::Display for AminoAcid {
         write!(f, "{}", repr)
     }
 }
+
+pub fn amino_acids_from_rna(rna: &str) -> Result<Vec<AminoAcid>, String> {
+    use self::AminoAcid::*;
+
+    let mut amino_acids = Vec::new();
+
+    for codon in super::CodonIterator::new(rna) {
+        let amino_acid = match codon {
+            "UUU" | "UUC" => Phenyalalanine,
+            "UUA" | "UUG" | "CUU" | "CUC" | "CUA" | "CUG" => Leucine,
+            "AUU" | "AUC" | "AUA" => Isoleucine,
+            "AUG" => Methionine,
+            "GUU" | "GUC" | "GUA" | "GUG" => Valine,
+            "UCU" | "UCC" | "UCA" | "UCG" => Serine,
+            "CCU" | "CCC" | "CCA" | "CCG" => Proline,
+            "ACU" | "ACC" | "ACA" | "ACG" => Threonine,
+            "GCU" | "GCC" | "GCA" | "GCG" => Alanine,
+            "UAU" | "UAC" => Tyrosine,
+            "CAU" | "CAC" => Histidine,
+            "CAA" | "CAG" => Glutamine,
+            "AAU" | "AAC" => Asparagine,
+            "AAA" | "AAG" => Lysine,
+            "GAU" | "GAC" => AsparticAcid,
+            "GAA" | "GAG" => GlutamicAcid,
+            "UGU" | "UGC" => Cysteine,
+            "UGG" => Tryptophan,
+            "CGU" | "CGC" | "CGA" | "CGG" => Arginine,
+            "AGU" | "AGC" => Serine,
+            "AGA" | "AGG" => Arginine,
+            "GGU" | "GGC" | "GGA" | "GGG" => Glycine,
+            "UAA" | "UAG" | "UGA" => {
+                // STOP codons, they don't code for any amino acid
+                continue;
+            }
+            _ => {
+                return Err(format!("No amino acid matching codon {}!", codon));
+            }
+        };
+
+        amino_acids.push(amino_acid);
+    }
+
+    Ok(amino_acids)
+}

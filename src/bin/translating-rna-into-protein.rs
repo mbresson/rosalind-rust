@@ -1,8 +1,5 @@
 extern crate rosalind;
 
-use std::fmt;
-use rosalind::amino_acids::AminoAcid;
-
 // solution to http://rosalind.info/problems/prot/
 
 #[cfg(test)]
@@ -22,18 +19,6 @@ mod tests {
     }
 }
 
-struct AminoAcidString(Vec<AminoAcid>);
-
-impl fmt::Display for AminoAcidString {
-    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
-        for amino_acid in &self.0 {
-            try!(write!(f, "{}", amino_acid));
-        }
-
-        Ok(())
-    }
-}
-
 fn main() {
     let messenger_rna = rosalind::io::load_data(file!()).expect("Couldn't open the file");
 
@@ -42,5 +27,8 @@ fn main() {
     let amino_acids = rosalind::amino_acids::amino_acids_from_rna(&messenger_rna)
         .expect("Error translating mRNA into amino acids!");
 
-    println!("AA string: {}", AminoAcidString(amino_acids));
+    println!(
+        "AA string: {}",
+        rosalind::amino_acids::AminoAcidString(&amino_acids)
+    );
 }

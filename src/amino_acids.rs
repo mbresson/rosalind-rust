@@ -1,7 +1,7 @@
 use std::fmt;
 use std::error;
 
-#[derive(PartialEq)]
+#[derive(PartialEq, PartialOrd, Eq, Clone, Ord)]
 pub enum AminoAcid {
     Alanine,
     Arginine,
@@ -149,4 +149,17 @@ pub fn amino_acids_from_rna(rna: &str) -> Result<Vec<AminoAcid>, String> {
     }
 
     Ok(amino_acids)
+}
+
+pub struct AminoAcidString<'a>(pub &'a Vec<AminoAcid>);
+
+// to be able to easily display a Vec<AminoAcid>
+impl<'a> fmt::Display for AminoAcidString<'a> {
+    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+        for amino_acid in self.0 {
+            try!(write!(f, "{}", amino_acid));
+        }
+
+        Ok(())
+    }
 }

@@ -6,20 +6,32 @@ use rosalind::amino_acids;
 
 #[cfg(test)]
 mod tests {
+    use rosalind::amino_acids::AminoAcid;
+
+    fn string_to_amino_acids(sequence: &str) -> Vec<AminoAcid> {
+        sequence
+            .chars()
+            .map(|ch| AminoAcid::from_char(ch).unwrap())
+            .collect()
+    }
+
     #[test]
     fn find_all_candidate_protein_strings() {
         let sequence = "AGCCATGTAGCTAACTCAGGTTACATGGGGATGACCCCGCGACTTGGATTAGAGTCTCTTTTGGAATAAGCCTGAATGATCCGAGTAGCATCTCAG";
 
-        let expected_candidates = vec![
-            "M",
-            "MLLGSFRLIPKETLIQVAGSSPCNLS",
-            "MGMTPRLGLESLLE",
-            "MTPRLGLESLLE",
-        ].sort();
+        let mut expected_candidates = vec![
+            string_to_amino_acids("M"),
+            string_to_amino_acids("MLLGSFRLIPKETLIQVAGSSPCNLS"),
+            string_to_amino_acids("MGMTPRLGLESLLE"),
+            string_to_amino_acids("MTPRLGLESLLE"),
+        ];
 
-        let candidates = ::find_all_candidate_protein_strings(sequence)
-            .expect("Error searching for candidates")
-            .sort();
+        expected_candidates.sort();
+
+        let mut candidates =
+            ::find_all_candidate_protein_strings(sequence).expect("Error searching for candidates");
+
+        candidates.sort();
 
         assert_eq!(candidates, expected_candidates);
     }

@@ -7,11 +7,11 @@ fn main() {
 
     println!("DNA string: {}", dna);
 
-    let (nb_adenyne, nb_thymine, nb_cytosine, nb_guanine) =
+    let (nb_adenine, nb_thymine, nb_cytosine, nb_guanine) =
         rosalind::count_nucleotides(&dna).expect("Error counting nucleotides!");
 
     println!(
-        "Adenyne: {}\nThymine: {}\nCytosine: {}\nGuanine: {}",
-        nb_adenyne, nb_thymine, nb_cytosine, nb_guanine
+        "Adenine: {}\nThymine: {}\nCytosine: {}\nGuanine: {}",
+        nb_adenine, nb_thymine, nb_cytosine, nb_guanine
     );
 }

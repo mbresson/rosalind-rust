@@ -1,7 +1,7 @@
 extern crate rosalind;
 
 use rosalind::fasta::{Label, Sequence};
-use rosalind::{Nucleobase, ADENYNE, CYTOSINE, GUANINE, THYMINE};
+use rosalind::{Nucleobase, ADENINE, CYTOSINE, GUANINE, THYMINE};
 
 // solution to http://rosalind.info/problems/cons/
 
@@ -77,7 +77,7 @@ fn row_to_string(row: &Vec<u32>) -> String {
 fn display_profile_matrix(profile_matrix: &ProfileMatrix) {
     println!(
         "A: {}",
-        row_to_string(&profile_matrix[nucleobase_index(ADENYNE).unwrap()])
+        row_to_string(&profile_matrix[nucleobase_index(ADENINE).unwrap()])
     );
     println!(
         "C: {}",
@@ -95,7 +95,7 @@ fn display_profile_matrix(profile_matrix: &ProfileMatrix) {
 
 fn nucleobase_index(nucleobase: Nucleobase) -> Result<usize, String> {
     match nucleobase {
-        ADENYNE => Ok(0),
+        ADENINE => Ok(0),
         CYTOSINE => Ok(1),
         GUANINE => Ok(2),
         THYMINE => Ok(3),
@@ -105,7 +105,7 @@ fn nucleobase_index(nucleobase: Nucleobase) -> Result<usize, String> {
 
 fn nucleobase_from_index(index: usize) -> Result<Nucleobase, String> {
     match index {
-        0 => Ok(ADENYNE),
+        0 => Ok(ADENINE),
         1 => Ok(CYTOSINE),
         2 => Ok(GUANINE),
         3 => Ok(THYMINE),
@@ -122,7 +122,7 @@ fn build_profile_matrix(sequences: Vec<(Label, Sequence)>) -> Result<ProfileMatr
     let sequences_length = first_sequence.len();
 
     let mut profile_matrix = [
-        vec![0; sequences_length], // Adenyne
+        vec![0; sequences_length], // Adenine
         vec![0; sequences_length], // Cytosize
         vec![0; sequences_length], // Guanine
         vec![0; sequences_length], // Thymine
@@ -162,7 +162,7 @@ fn compute_consensus_string(profile_matrix: &ProfileMatrix) -> String {
 
     for (index, _) in profile_matrix[0].iter().enumerate() {
         let nucleobases = [
-            profile_matrix[nucleobase_index(ADENYNE).unwrap()][index],
+            profile_matrix[nucleobase_index(ADENINE).unwrap()][index],
             profile_matrix[nucleobase_index(CYTOSINE).unwrap()][index],
             profile_matrix[nucleobase_index(GUANINE).unwrap()][index],
             profile_matrix[nucleobase_index(THYMINE).unwrap()][index],

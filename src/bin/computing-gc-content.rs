@@ -18,10 +18,10 @@ mod tests {
 
 // returns the GC content as a float between 0 and 1
 fn compute_gc_content(sequence: &str) -> Result<f64, String> {
-    let (nb_adenyne, nb_thymine, nb_cytosine, nb_guanine) = rosalind::count_nucleotides(sequence)?;
+    let (nb_adenine, nb_thymine, nb_cytosine, nb_guanine) = rosalind::count_nucleotides(sequence)?;
 
     let nb_gc = (nb_cytosine + nb_guanine) as f64;
-    let nb_bases = (nb_adenyne + nb_thymine + nb_cytosine + nb_guanine) as f64;
+    let nb_bases = (nb_adenine + nb_thymine + nb_cytosine + nb_guanine) as f64;
 
     Ok(nb_gc / nb_bases)
 }

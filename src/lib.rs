@@ -5,7 +5,7 @@ pub mod amino_acids;
 
 pub type Nucleobase = char;
 
-pub const ADENYNE: Nucleobase = 'A';
+pub const ADENINE: Nucleobase = 'A';
 pub const THYMINE: Nucleobase = 'T';
 pub const CYTOSINE: Nucleobase = 'C';
 pub const GUANINE: Nucleobase = 'G';
@@ -17,10 +17,10 @@ mod tests {
     fn count_nucleotides() {
         let dna = "AGCTTTTCATTCTGACTGCAACGGGCAATATGTCTCTGTGTGGATTAAAAAAAGAGTGTCTGATAGCAGC";
 
-        let (nb_adenyne, nb_thymine, nb_cytosine, nb_guanine) =
+        let (nb_adenine, nb_thymine, nb_cytosine, nb_guanine) =
             ::count_nucleotides(dna).expect("Couldn't count nucleotides!");
 
-        assert_eq!(nb_adenyne, 20);
+        assert_eq!(nb_adenine, 20);
         assert_eq!(nb_cytosine, 12);
         assert_eq!(nb_guanine, 17);
         assert_eq!(nb_thymine, 21);
@@ -48,7 +48,7 @@ mod tests {
     }
 }
 
-/// Returns the number of (adenyne, thymine, cytosine, guanine) nucleotides in the `dna` string.
+/// Returns the number of (adenine, thymine, cytosine, guanine) nucleotides in the `dna` string.
 ///
 /// # Examples
 ///
@@ -64,11 +64,11 @@ mod tests {
 /// }
 /// ```
 pub fn count_nucleotides(dna: &str) -> Result<(u32, u32, u32, u32), String> {
-    let (mut adenyne, mut thymine, mut cytosine, mut guanine) = (0u32, 0u32, 0u32, 0u32);
+    let (mut adenine, mut thymine, mut cytosine, mut guanine) = (0u32, 0u32, 0u32, 0u32);
 
     for nucleotide in dna.chars() {
         match nucleotide {
-            ADENYNE => adenyne += 1,
+            ADENINE => adenine += 1,
             THYMINE => thymine += 1,
             CYTOSINE => cytosine += 1,
             GUANINE => guanine += 1,
@@ -76,13 +76,13 @@ pub fn count_nucleotides(dna: &str) -> Result<(u32, u32, u32, u32), String> {
         }
     }
 
-    Ok((adenyne, thymine, cytosine, guanine))
+    Ok((adenine, thymine, cytosine, guanine))
 }
 
 fn base_complement(base: Nucleobase) -> Result<Nucleobase, String> {
     match base {
-        ADENYNE => Ok(THYMINE),
-        THYMINE => Ok(ADENYNE),
+        ADENINE => Ok(THYMINE),
+        THYMINE => Ok(ADENINE),
         CYTOSINE => Ok(GUANINE),
         GUANINE => Ok(CYTOSINE),
         _ => Err(format!("Unexpected nucleobase: {}", base)),
@@ -124,7 +124,7 @@ impl<'a> Iterator for CodonIterator<'a> {
 fn dna_base_to_rna_base(base: char) -> Result<char, String> {
     match base {
         THYMINE => Ok(URACIL),
-        ADENYNE | CYTOSINE | GUANINE => Ok(base),
+        ADENINE | CYTOSINE | GUANINE => Ok(base),
         _ => Err(format!("Unexpected nucleobase: {}", base)),
     }
 }

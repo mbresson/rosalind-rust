@@ -1,7 +1,9 @@
 
 # rosalind-rust
 
-This project contains my solutions to the problems from Rosalind platform (http://rosalind.info) to learn the basics of bioinformatics (with the help of this online course: https://www.canal-u.tv/producteurs/inria/bioinformatics_genomes_and_algorithms), and I also use it as an opportunity to practice Rust which I wanted to learn for a long time. As a result, the code is imperfect, sometimes too verbose, sometimes not enough, sometimes over-engineered, etc. Any suggestion or correction to make my code more Rust-y/idiomatic/elegant/performant is welcome.
+This project contains my solutions to the problems from Rosalind platform (http://rosalind.info) to learn the basics of bioinformatics (with the help of this online course: https://www.canal-u.tv/producteurs/inria/bioinformatics_genomes_and_algorithms), and I also use it as an opportunity to practice Rust which I wanted to learn for a long time. As a result, the code is imperfect, sometimes too verbose (or not enough) and ridiculously over-engineered.
+
+Any suggestion or correction to make my code more Rust-y/idiomatic/elegant/performant would be most welcome!
 
 ## Test it
 

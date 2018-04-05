@@ -157,7 +157,7 @@ pub struct AminoAcidString<'a>(pub &'a Vec<AminoAcid>);
 impl<'a> fmt::Display for AminoAcidString<'a> {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
         for amino_acid in self.0 {
-            try!(write!(f, "{}", amino_acid));
+            write!(f, "{}", amino_acid)?;
         }
 
         Ok(())

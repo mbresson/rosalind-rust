@@ -103,9 +103,9 @@ where
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
         for (index, item) in self.0.iter().enumerate() {
             if index == 0 {
-                try!(write!(f, "{}", item));
+                write!(f, "{}", item)?;
             } else {
-                try!(write!(f, " {}", item));
+                write!(f, " {}", item)?;
             }
         }
 

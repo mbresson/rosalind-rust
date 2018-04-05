@@ -2,7 +2,7 @@ extern crate rosalind;
 
 // solution to http://rosalind.info/problems/dna/
 
-use rosalind::dna::sequence::Sequence;
+use rosalind::dna;
 use std::convert::TryFrom;
 
 fn main() {
@@ -10,7 +10,7 @@ fn main() {
 
     println!("DNA string: {}", dna);
 
-    let count = Sequence::try_from(dna.as_ref())
+    let count = dna::Sequence::try_from(dna.as_ref())
         .unwrap()
         .count_nucleobases();
 

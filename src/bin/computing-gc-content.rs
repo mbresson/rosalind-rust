@@ -2,7 +2,7 @@ extern crate rosalind;
 
 // solution to http://rosalind.info/problems/gc/
 
-use rosalind::dna::sequence::Sequence;
+use rosalind::dna;
 use std::convert::TryFrom;
 
 #[cfg(test)]
@@ -21,7 +21,9 @@ mod tests {
 
 // returns the GC content as a float between 0 and 1
 fn compute_gc_content(sequence: &str) -> f64 {
-    let count = Sequence::try_from(sequence).unwrap().count_nucleobases();
+    let count = dna::Sequence::try_from(sequence)
+        .unwrap()
+        .count_nucleobases();
 
     let nb_gc = (count.cytosines + count.guanines) as f64;
     let nb_bases = (count.adenines + count.thymines + count.cytosines + count.guanines) as f64;

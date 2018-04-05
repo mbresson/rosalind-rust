@@ -1,3 +1,6 @@
+pub use self::nucleobase::Nucleobase;
+pub use self::sequence::Sequence;
+
 pub mod nucleobase {
     #[cfg(test)]
     mod tests {
@@ -33,6 +36,29 @@ pub mod nucleobase {
         Guanine,
     }
 
+    impl Nucleobase {
+        /// Returns the complement of the nucleobase: A <=> T and C <=> G.
+        ///
+        /// # Examples
+        ///
+        /// ```
+        ///
+        /// let nucleobase = rosalind::dna::Nucleobase::Adenine;
+        ///
+        /// let complement = nucleobase.complement();
+        /// ```
+        pub fn complement(&self) -> Nucleobase {
+            use self::Nucleobase::*;
+
+            match self {
+                Adenine => Thymine,
+                Thymine => Adenine,
+                Cytosine => Guanine,
+                Guanine => Cytosine,
+            }
+        }
+    }
+
     #[derive(Debug, PartialEq)]
     pub enum ParseError {
         IllegalChar { ch: char },
@@ -63,6 +89,18 @@ pub mod nucleobase {
     impl convert::TryFrom<char> for Nucleobase {
         type Error = ParseError;
 
+        /// Tries to parse a single char to its corresponding DNA nucleobase.
+        ///
+        /// # Examples
+        ///
+        /// ```
+        /// use std::convert::TryFrom;
+        ///
+        /// match rosalind::dna::Nucleobase::try_from('C') {
+        ///     Ok(nucleobase) => println!("{:?}", nucleobase),
+        ///     Err(error) => println!("{:?}", error),
+        /// }
+        /// ```
         fn try_from(ch: char) -> Result<Self, Self::Error> {
             use self::Nucleobase::{Adenine, Cytosine, Guanine, Thymine};
 
@@ -85,7 +123,7 @@ pub mod sequence {
     #[cfg(test)]
     mod tests {
         use super::Sequence;
-        use super::super::nucleobase;
+        use super::super::{nucleobase, Nucleobase};
         use std::convert::TryFrom;
 
         #[test]
@@ -101,7 +139,7 @@ pub mod sequence {
 
         #[test]
         fn try_from() {
-            use self::nucleobase::Nucleobase::*;
+            use self::Nucleobase::*;
 
             let sequence = "AATGCGA";
 
@@ -129,10 +167,10 @@ pub mod sequence {
 
     use std::convert::TryFrom;
     use super::nucleobase;
-    use super::nucleobase::Nucleobase;
+    use super::Nucleobase;
 
     #[derive(Debug, PartialEq)]
-    pub struct Sequence(Vec<nucleobase::Nucleobase>);
+    pub struct Sequence(Vec<Nucleobase>);
 
     // as of 2018, the largest genome ever sequenced is the Axolotl genome: approx. 32 billion base pairs
     // if we ever happen to count the nucleobases of such a big genome,
@@ -153,7 +191,7 @@ pub mod sequence {
         /// ```
         /// use std::convert::TryFrom;
         ///
-        /// let sequence = rosalind::dna::sequence::Sequence::try_from("AATAGGCTA").expect("Couldn't parse sequence");
+        /// let sequence = rosalind::dna::Sequence::try_from("AATAGGCTA").expect("Couldn't parse sequence");
         /// let count = sequence.count_nucleobases();
         ///
         /// println!(
@@ -195,6 +233,18 @@ pub mod sequence {
     impl<'a> TryFrom<&'a str> for Sequence {
         type Error = ParseError;
 
+        /// Tries to parse a &str to a sequence of DNA nucleobases.
+        ///
+        /// # Examples
+        ///
+        /// ```
+        /// use std::convert::TryFrom;
+        ///
+        /// match rosalind::dna::Sequence::try_from("TTACGGGCAT") {
+        ///     Ok(sequence) => println!("{:?}", sequence),
+        ///     Err(error) => println!("{:?}", error),
+        /// }
+        /// ```
         fn try_from(value: &str) -> Result<Self, Self::Error> {
             let mut sequence = Vec::new();
 

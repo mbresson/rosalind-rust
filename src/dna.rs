@@ -24,6 +24,15 @@ pub mod nucleobase {
             assert_eq!(super::Nucleobase::try_from('C').unwrap(), Cytosine);
             assert_eq!(super::Nucleobase::try_from('G').unwrap(), Guanine);
         }
+
+        #[test]
+        fn complement() {
+            use super::Nucleobase::*;
+            assert_eq!(Adenine.complement(), Thymine);
+            assert_eq!(Thymine.complement(), Adenine);
+            assert_eq!(Cytosine.complement(), Guanine);
+            assert_eq!(Guanine.complement(), Cytosine);
+        }
     }
 
     use std::{convert, error, fmt};
@@ -55,6 +64,19 @@ pub mod nucleobase {
                 Thymine => Adenine,
                 Cytosine => Guanine,
                 Guanine => Cytosine,
+            }
+        }
+    }
+
+    impl fmt::Display for Nucleobase {
+        fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+            use self::Nucleobase::*;
+
+            match self {
+                Adenine => write!(f, "A"),
+                Thymine => write!(f, "T"),
+                Cytosine => write!(f, "C"),
+                Guanine => write!(f, "G"),
             }
         }
     }
@@ -97,7 +119,7 @@ pub mod nucleobase {
         /// use std::convert::TryFrom;
         ///
         /// match rosalind::dna::Nucleobase::try_from('C') {
-        ///     Ok(nucleobase) => println!("{:?}", nucleobase),
+        ///     Ok(nucleobase) => println!("{}", nucleobase),
         ///     Err(error) => println!("{:?}", error),
         /// }
         /// ```
@@ -163,9 +185,18 @@ pub mod sequence {
 
             assert_eq!(sequence.count_nucleobases(), expected_count);
         }
+
+        #[test]
+        fn reverse_complement() {
+            let sequence = Sequence::try_from("AATAGGCTA").unwrap();
+
+            let expected_reverse_complement = Sequence::try_from("TAGCCTATT").unwrap();
+
+            assert_eq!(sequence.reverse_complement(), expected_reverse_complement);
+        }
     }
 
-    use std::convert::TryFrom;
+    use std::{convert, fmt};
     use super::nucleobase;
     use super::Nucleobase;
 
@@ -184,6 +215,26 @@ pub mod sequence {
     }
 
     impl Sequence {
+        /// Returns the reverse complement of the DNA sequence.
+        ///
+        /// # Examples
+        ///
+        /// ```
+        /// use std::convert::TryFrom;
+        ///
+        /// let sequence = rosalind::dna::Sequence::try_from("AATAGGCTA").expect("Couldn't parse sequence");
+        /// println!("{}", sequence.reverse_complement());
+        /// ```
+        pub fn reverse_complement(&self) -> Sequence {
+            Sequence(
+                self.0
+                    .iter()
+                    .rev()
+                    .map(|nucleobase| nucleobase.complement())
+                    .collect(),
+            )
+        }
+
         /// Returns the number of each A, T, C, G nucleobase in the `dna` sequence.
         ///
         /// # Examples
@@ -222,6 +273,16 @@ pub mod sequence {
         }
     }
 
+    impl fmt::Display for Sequence {
+        fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+            for nucleobase in &self.0 {
+                write!(f, "{}", nucleobase)?;
+            }
+
+            Ok(())
+        }
+    }
+
     #[derive(Debug, PartialEq)]
     pub enum ParseError {
         NucleobaseError {
@@ -230,7 +291,7 @@ pub mod sequence {
         },
     }
 
-    impl<'a> TryFrom<&'a str> for Sequence {
+    impl<'a> convert::TryFrom<&'a str> for Sequence {
         type Error = ParseError;
 
         /// Tries to parse a &str to a sequence of DNA nucleobases.
@@ -241,7 +302,7 @@ pub mod sequence {
         /// use std::convert::TryFrom;
         ///
         /// match rosalind::dna::Sequence::try_from("TTACGGGCAT") {
-        ///     Ok(sequence) => println!("{:?}", sequence),
+        ///     Ok(sequence) => println!("{}", sequence),
         ///     Err(error) => println!("{:?}", error),
         /// }
         /// ```

@@ -12,33 +12,6 @@ pub const CYTOSINE: Nucleobase = 'C';
 pub const GUANINE: Nucleobase = 'G';
 pub const URACIL: Nucleobase = 'U';
 
-#[cfg(test)]
-mod tests {
-    #[test]
-    fn reverse_complement_dna_strand() {
-        let strand = "AAAACCCGGT";
-
-        let complemented_strand = ::reverse_complement_dna_strand(&strand)
-            .expect("Error reversing and complementing the strand!");
-
-        assert_eq!(complemented_strand, "ACCGGGTTTT");
-    }
-}
-
-fn base_complement(base: Nucleobase) -> Result<Nucleobase, String> {
-    match base {
-        ADENINE => Ok(THYMINE),
-        THYMINE => Ok(ADENINE),
-        CYTOSINE => Ok(GUANINE),
-        GUANINE => Ok(CYTOSINE),
-        _ => Err(format!("Unexpected nucleobase: {}", base)),
-    }
-}
-
-pub fn reverse_complement_dna_strand(strand: &str) -> Result<String, String> {
-    strand.chars().rev().map(base_complement).collect()
-}
-
 // CodonIterator iterates over all the codons of a RNA string
 // a codon is a group of 3 nucleobases
 // if the length of the RNA string is not a multiple of 3, the remaining bases are skipped

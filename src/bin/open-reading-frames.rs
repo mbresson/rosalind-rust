@@ -3,10 +3,14 @@ extern crate rosalind;
 // solution to http://rosalind.info/problems/orf/
 
 use rosalind::amino_acids;
+use rosalind::dna::Sequence;
+use std::convert::TryFrom;
 
 #[cfg(test)]
 mod tests {
     use rosalind::amino_acids::AminoAcid;
+    use std::convert::TryFrom;
+    use rosalind::dna::Sequence;
 
     fn string_to_amino_acids(sequence: &str) -> Vec<AminoAcid> {
         sequence
@@ -17,7 +21,7 @@ mod tests {
 
     #[test]
     fn find_all_candidate_protein_strings() {
-        let sequence = "AGCCATGTAGCTAACTCAGGTTACATGGGGATGACCCCGCGACTTGGATTAGAGTCTCTTTTGGAATAAGCCTGAATGATCCGAGTAGCATCTCAG";
+        let sequence = Sequence::try_from("AGCCATGTAGCTAACTCAGGTTACATGGGGATGACCCCGCGACTTGGATTAGAGTCTCTTTTGGAATAAGCCTGAATGATCCGAGTAGCATCTCAG").unwrap();
 
         let mut expected_candidates = vec![
             string_to_amino_acids("M"),
@@ -28,8 +32,8 @@ mod tests {
 
         expected_candidates.sort();
 
-        let mut candidates =
-            ::find_all_candidate_protein_strings(sequence).expect("Error searching for candidates");
+        let mut candidates = ::find_all_candidate_protein_strings(&sequence)
+            .expect("Error searching for candidates");
 
         candidates.sort();
 
@@ -80,12 +84,12 @@ fn find_candidate_protein_strings_in_codons_sequence(
 }
 
 fn find_all_candidate_protein_strings(
-    dna_sequence: &str,
+    dna_sequence: &Sequence,
 ) -> Result<Vec<Vec<amino_acids::AminoAcid>>, String> {
-    let rna = rosalind::dna_to_rna(dna_sequence)?;
+    let rna = rosalind::dna_to_rna(&dna_sequence.to_string())?;
 
-    let rna_reverse_complement = rosalind::reverse_complement_dna_strand(dna_sequence)
-        .and_then(|sequence| rosalind::dna_to_rna(&sequence))?;
+    let rna_reverse_complement =
+        rosalind::dna_to_rna(&dna_sequence.reverse_complement().to_string())?;
 
     let codons_sequences = vec![
         rosalind::CodonIterator::new(&rna).collect(),
@@ -114,11 +118,14 @@ fn find_all_candidate_protein_strings(
 fn main() {
     let fasta_content = rosalind::io::load_data(file!()).expect("Couldn't open the file");
 
-    let sequences = rosalind::fasta::parse_fasta_format_to_map(&fasta_content)
+    let sequences_strings = rosalind::fasta::parse_fasta_format_to_map(&fasta_content)
         .expect("Couldn't parse FASTA data");
 
-    for (label, sequence) in sequences.iter() {
+    for (label, sequence_string) in sequences_strings.iter() {
         println!("{}", label);
+
+        let sequence = Sequence::try_from(sequence_string.as_ref())
+            .expect("Couldn't parse DNA sequence string");
 
         let candidate_protein_strings =
             find_all_candidate_protein_strings(&sequence).expect("Should work");

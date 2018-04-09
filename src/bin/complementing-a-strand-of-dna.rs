@@ -6,15 +6,13 @@ use rosalind::dna::Sequence;
 use std::convert::TryFrom;
 
 fn main() {
-    let dna_strand = Sequence::try_from(
-        rosalind::io::load_data(file!())
-            .expect("Couldn't open the file")
-            .as_ref(),
-    ).unwrap();
+    let dna_str = rosalind::io::load_data(file!()).expect("Couldn't open the file");
 
-    println!("DNA strand: {}", dna_strand);
+    let dna = Sequence::try_from(dna_str.as_str()).expect("Couldn't parse the sequence");
 
-    let complemented_strand = dna_strand.reverse_complement();
+    println!("DNA strand: {}", dna);
+
+    let complemented_strand = dna.reverse_complement();
 
     println!("Reverse complement: {}", complemented_strand);
 }

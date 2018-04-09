@@ -2,32 +2,29 @@ extern crate rosalind;
 
 // solution to http://rosalind.info/problems/orf/
 
-use rosalind::amino_acids;
-use rosalind::dna::Sequence;
 use std::convert::TryFrom;
+use std::iter::FromIterator;
+
+use rosalind::dna::Sequence as DnaSequence;
+use rosalind::rna::{frequent_codons, Nucleobase as RnaNucleobase, Sequence as RnaSequence,
+                    StrictCodonIterator};
+use rosalind::amino_acids::Sequence as AaSequence;
 
 #[cfg(test)]
 mod tests {
-    use rosalind::amino_acids::AminoAcid;
+    use rosalind::amino_acids::Sequence as AaSequence;
     use std::convert::TryFrom;
-    use rosalind::dna::Sequence;
-
-    fn string_to_amino_acids(sequence: &str) -> Vec<AminoAcid> {
-        sequence
-            .chars()
-            .map(|ch| AminoAcid::from_char(ch).unwrap())
-            .collect()
-    }
+    use rosalind::dna::Sequence as DnaSequence;
 
     #[test]
     fn find_all_candidate_protein_strings() {
-        let sequence = Sequence::try_from("AGCCATGTAGCTAACTCAGGTTACATGGGGATGACCCCGCGACTTGGATTAGAGTCTCTTTTGGAATAAGCCTGAATGATCCGAGTAGCATCTCAG").unwrap();
+        let sequence = DnaSequence::try_from("AGCCATGTAGCTAACTCAGGTTACATGGGGATGACCCCGCGACTTGGATTAGAGTCTCTTTTGGAATAAGCCTGAATGATCCGAGTAGCATCTCAG").unwrap();
 
         let mut expected_candidates = vec![
-            string_to_amino_acids("M"),
-            string_to_amino_acids("MLLGSFRLIPKETLIQVAGSSPCNLS"),
-            string_to_amino_acids("MGMTPRLGLESLLE"),
-            string_to_amino_acids("MTPRLGLESLLE"),
+            AaSequence::try_from("M").unwrap(),
+            AaSequence::try_from("MLLGSFRLIPKETLIQVAGSSPCNLS").unwrap(),
+            AaSequence::try_from("MGMTPRLGLESLLE").unwrap(),
+            AaSequence::try_from("MTPRLGLESLLE").unwrap(),
         ];
 
         expected_candidates.sort();
@@ -41,36 +38,38 @@ mod tests {
     }
 }
 
-const RNA_START_CODON: &str = "AUG";
-const RNA_END_CODON_1: &str = "UAA";
-const RNA_END_CODON_2: &str = "UAG";
-const RNA_END_CODON_3: &str = "UGA";
+fn is_stop_codon(codon: &[RnaNucleobase]) -> bool {
+    use frequent_codons::*;
+
+    match codon {
+        UAA | UAG | UGA => true,
+        _ => false,
+    }
+}
+
+const RNA_START_CODON: &[RnaNucleobase] = frequent_codons::AUG;
 
 fn find_candidate_protein_strings_in_codons_sequence(
-    codons: Vec<&str>,
-) -> Result<Vec<Vec<amino_acids::AminoAcid>>, String> {
+    codons: Vec<&[RnaNucleobase]>,
+) -> Result<Vec<AaSequence>, String> {
     let mut candidates = Vec::new();
 
     let mut index = 0;
 
     while index < codons.len() {
         if codons[index] == RNA_START_CODON {
-            let mut candidate = RNA_START_CODON.to_string();
+            let mut candidate = Vec::from_iter(RNA_START_CODON.iter().cloned());
 
             let mut index_end = index + 1;
             while index_end < codons.len() {
-                let has_end_codon = match codons[index_end] {
-                    RNA_END_CODON_1 | RNA_END_CODON_2 | RNA_END_CODON_3 => true,
-                    codon => {
-                        candidate.push_str(codon);
-                        false
-                    }
-                };
+                if is_stop_codon(codons[index_end]) {
+                    let sequence = RnaSequence::new(candidate);
 
-                if has_end_codon {
-                    candidates.push(amino_acids::amino_acids_from_rna(&candidate)?);
+                    candidates.push(AaSequence::from(&sequence));
 
                     break;
+                } else {
+                    candidate.extend(codons[index_end].iter().cloned());
                 }
 
                 index_end += 1;
@@ -84,13 +83,30 @@ fn find_candidate_protein_strings_in_codons_sequence(
 }
 
 fn find_all_candidate_protein_strings(
-    dna_sequence: &Sequence,
-) -> Result<Vec<Vec<amino_acids::AminoAcid>>, String> {
-    let rna = rosalind::dna_to_rna(&dna_sequence.to_string())?;
+    dna_sequence: &DnaSequence,
+) -> Result<Vec<AaSequence>, String> {
+    let rna_reverse_complement = RnaSequence::from(&dna_sequence.reverse_complement());
 
-    let rna_reverse_complement =
-        rosalind::dna_to_rna(&dna_sequence.reverse_complement().to_string())?;
+    let rna = RnaSequence::from(dna_sequence);
 
+    let codons_sequences = vec![
+        StrictCodonIterator::new_starting_from(&rna, 0).collect(),
+        StrictCodonIterator::new_starting_from(&rna, 1).collect(),
+        StrictCodonIterator::new_starting_from(&rna, 2).collect(),
+        StrictCodonIterator::new_starting_from(&rna_reverse_complement, 0).collect(),
+        StrictCodonIterator::new_starting_from(&rna_reverse_complement, 1).collect(),
+        StrictCodonIterator::new_starting_from(&rna_reverse_complement, 2).collect(),
+        /*
+        rosalind::CodonIterator::new(&rna).collect(),
+        rosalind::CodonIterator::new(&rna[1..]).collect(),
+        rosalind::CodonIterator::new(&rna[2..]).collect(),
+        rosalind::CodonIterator::new(&rna_reverse_complement).collect(),
+        rosalind::CodonIterator::new(&rna_reverse_complement[1..]).collect(),
+        rosalind::CodonIterator::new(&rna_reverse_complement[2..]).collect(),
+*/
+    ];
+
+    /*
     let codons_sequences = vec![
         rosalind::CodonIterator::new(&rna).collect(),
         rosalind::CodonIterator::new(&rna[1..]).collect(),
@@ -99,6 +115,7 @@ fn find_all_candidate_protein_strings(
         rosalind::CodonIterator::new(&rna_reverse_complement[1..]).collect(),
         rosalind::CodonIterator::new(&rna_reverse_complement[2..]).collect(),
     ];
+     */
 
     let mut candidates = Vec::new();
 
@@ -124,14 +141,14 @@ fn main() {
     for (label, sequence_string) in sequences_strings.iter() {
         println!("{}", label);
 
-        let sequence = Sequence::try_from(sequence_string.as_ref())
-            .expect("Couldn't parse DNA sequence string");
+        let sequence =
+            DnaSequence::try_from(sequence_string.as_str()).expect("Couldn't parse the sequence");
 
         let candidate_protein_strings =
             find_all_candidate_protein_strings(&sequence).expect("Should work");
 
         for candidate in candidate_protein_strings {
-            println!("{}", amino_acids::AminoAcidString(&candidate));
+            println!("{}", candidate);
         }
     }
 }

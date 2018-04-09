@@ -1,5 +1,6 @@
 extern crate rosalind;
 
+use std::convert::TryFrom;
 use rosalind::amino_acids::AminoAcid;
 
 // solution to http://rosalind.info/problems/mrna/
@@ -49,7 +50,7 @@ fn compute_number_possible_rna_mod_1_000_000(proteins_string: &str) -> u32 {
     let mut possible_rna_modulo = 1;
 
     for aa_str in proteins_string.chars() {
-        let aa = AminoAcid::from_char(aa_str).expect("Incorrect AA string");
+        let aa = AminoAcid::try_from(aa_str).expect("Incorrect AA string");
 
         let possible_codons = possible_codons_for_aa(aa);
         let num_possible_codons = possible_codons.len() as u32;

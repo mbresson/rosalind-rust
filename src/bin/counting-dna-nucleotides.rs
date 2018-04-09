@@ -10,7 +10,7 @@ fn main() {
 
     println!("DNA string: {}", dna);
 
-    let count = dna::Sequence::try_from(dna.as_ref())
+    let count = dna::Sequence::try_from(dna.as_str())
         .unwrap()
         .count_nucleobases();
 

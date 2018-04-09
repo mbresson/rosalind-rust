@@ -1,6 +1,7 @@
 extern crate reqwest;
 extern crate rosalind;
 
+use std::convert::TryFrom;
 use std::error::Error;
 use rosalind::amino_acids;
 use rosalind::amino_acids::AminoAcid;
@@ -9,6 +10,7 @@ use rosalind::amino_acids::AminoAcid;
 
 #[cfg(test)]
 mod tests {
+    use std::convert::TryFrom;
     use rosalind::amino_acids::AminoAcid;
 
     #[test]
@@ -19,7 +21,7 @@ mod tests {
 
         let protein = protein_string
             .chars()
-            .map(|ch| AminoAcid::from_char(ch).unwrap())
+            .map(|ch| AminoAcid::try_from(ch).unwrap())
             .collect();
 
         let positions = ::find_all_n_glycosylation_motif_positions_in_protein(protein);
@@ -78,7 +80,7 @@ fn download_protein_from_uniprot(protein_id: &str) -> Result<Vec<AminoAcid>, Uni
     } else {
         Ok(protein_sequence
             .chars()
-            .map(AminoAcid::from_char)
+            .map(|ch| AminoAcid::try_from(ch))
             .collect::<Result<Vec<AminoAcid>, _>>()?)
     }
 }

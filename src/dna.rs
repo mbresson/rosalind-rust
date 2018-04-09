@@ -15,7 +15,7 @@ pub mod nucleobase {
         }
 
         #[test]
-        fn try_from() {
+        fn try_from_char() {
             use std::convert::TryFrom;
             use super::Nucleobase::*;
 
@@ -37,7 +37,7 @@ pub mod nucleobase {
 
     use std::{convert, error, fmt};
 
-    #[derive(Debug, PartialEq)]
+    #[derive(Clone, Debug, PartialEq)]
     pub enum Nucleobase {
         Adenine,
         Thymine,
@@ -56,7 +56,7 @@ pub mod nucleobase {
         ///
         /// let complement = nucleobase.complement();
         /// ```
-        pub fn complement(&self) -> Nucleobase {
+        pub fn complement(&self) -> Self {
             use self::Nucleobase::*;
 
             match self {
@@ -101,7 +101,7 @@ pub mod nucleobase {
             match self {
                 ParseError::IllegalChar { ch } => write!(
                     f,
-                    "there is no such nucleobase as represented by character {}",
+                    "there is no such DNA nucleobase as represented by character {}",
                     ch
                 ),
             }
@@ -149,7 +149,7 @@ pub mod sequence {
         use std::convert::TryFrom;
 
         #[test]
-        fn try_from_erroneous_sequence() {
+        fn try_from_erroneous_str() {
             assert_eq!(
                 Sequence::try_from("ATECCG").unwrap_err(),
                 super::ParseError::NucleobaseError {
@@ -160,7 +160,7 @@ pub mod sequence {
         }
 
         #[test]
-        fn try_from() {
+        fn try_from_str() {
             use self::Nucleobase::*;
 
             let sequence = "AATGCGA";
@@ -197,7 +197,6 @@ pub mod sequence {
     }
 
     use std::{convert, fmt};
-    use super::nucleobase;
     use super::Nucleobase;
 
     #[derive(Debug, PartialEq)]
@@ -215,6 +214,10 @@ pub mod sequence {
     }
 
     impl Sequence {
+        pub fn len(&self) -> usize {
+            self.0.len()
+        }
+
         /// Returns the reverse complement of the DNA sequence.
         ///
         /// # Examples
@@ -225,7 +228,7 @@ pub mod sequence {
         /// let sequence = rosalind::dna::Sequence::try_from("AATAGGCTA").expect("Couldn't parse sequence");
         /// println!("{}", sequence.reverse_complement());
         /// ```
-        pub fn reverse_complement(&self) -> Sequence {
+        pub fn reverse_complement(&self) -> Self {
             Sequence(
                 self.0
                     .iter()
@@ -287,7 +290,7 @@ pub mod sequence {
     pub enum ParseError {
         NucleobaseError {
             index: usize,
-            error: nucleobase::ParseError,
+            error: super::nucleobase::ParseError,
         },
     }
 
@@ -324,6 +327,28 @@ pub mod sequence {
             }
 
             Ok(Sequence(sequence))
+        }
+    }
+
+    /// Cloning iterator over a DNA sequence's nucleobases.
+    ///
+    /// # Examples
+    ///
+    /// ```
+    /// use std::convert::TryFrom;
+    ///
+    /// let sequence = rosalind::dna::Sequence::try_from("AATTAGCCG").unwrap();
+    ///
+    /// for nucleobase in &sequence {
+    ///     println!("{}", nucleobase);
+    /// }
+    /// ```
+    impl<'a> IntoIterator for &'a Sequence {
+        type Item = Nucleobase;
+        type IntoIter = ::std::iter::Cloned<::std::slice::Iter<'a, Nucleobase>>;
+
+        fn into_iter(self) -> Self::IntoIter {
+            self.0.iter().cloned()
         }
     }
 }

@@ -1,5 +1,8 @@
-use std::fmt;
-use std::error;
+use std::{convert, error, fmt};
+
+pub use self::sequence::Sequence;
+
+use rna::Sequence as RnaSequence;
 
 #[derive(Debug, PartialEq, PartialOrd, Eq, Clone, Ord)]
 pub enum AminoAcid {
@@ -25,32 +28,52 @@ pub enum AminoAcid {
     Valine,
 }
 
-#[derive(Debug, Clone)]
-pub struct ParseError;
+#[derive(Debug, PartialEq)]
+pub enum ParseError {
+    IllegalChar { ch: char },
+}
+
+impl error::Error for ParseError {
+    fn description(&self) -> &str {
+        match self {
+            ParseError::IllegalChar { .. } => {
+                "there is no such amino acid as represented by this character"
+            }
+        }
+    }
+}
 
 impl fmt::Display for ParseError {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
-        write!(f, "invalid sequence")
+        match self {
+            ParseError::IllegalChar { ch } => write!(
+                f,
+                "there is no such amino acid as represented by character {}",
+                ch
+            ),
+        }
     }
 }
 
-// quick & dirty impl for the moment
-impl error::Error for ParseError {
-    fn description(&self) -> &str {
-        "invalid sequence"
-    }
+impl convert::TryFrom<char> for AminoAcid {
+    type Error = ParseError;
 
-    fn cause(&self) -> Option<&error::Error> {
-        None
-    }
-}
-
-impl AminoAcid {
-    // TODO when std::convert::TryFrom trait moves into stable Rust, use it (https://doc.rust-lang.org/std/convert/trait.TryFrom.html)
-    pub fn from_char(aa_char: char) -> Result<AminoAcid, ParseError> {
+    /// Tries to parse a single char to its corresponding amino acid.
+    ///
+    /// # Examples
+    ///
+    /// ```
+    /// use std::convert::TryFrom;
+    ///
+    /// match rosalind::amino_acids::AminoAcid::try_from('S') {
+    ///     Ok(nucleobase) => println!("{}", nucleobase),
+    ///     Err(error) => println!("{:?}", error),
+    /// }
+    /// ```
+    fn try_from(ch: char) -> Result<Self, Self::Error> {
         use self::AminoAcid::*;
 
-        match aa_char {
+        match ch {
             'F' => Ok(Phenyalalanine),
             'L' => Ok(Leucine),
             'I' => Ok(Isoleucine),
@@ -71,7 +94,7 @@ impl AminoAcid {
             'W' => Ok(Tryptophan),
             'R' => Ok(Arginine),
             'G' => Ok(Glycine),
-            _ => Err(ParseError),
+            _ => Err(ParseError::IllegalChar { ch }),
         }
     }
 }
@@ -107,59 +130,142 @@ impl fmt::Display for AminoAcid {
     }
 }
 
-pub fn amino_acids_from_rna(rna: &str) -> Result<Vec<AminoAcid>, String> {
-    use self::AminoAcid::*;
+mod sequence {
 
-    let mut amino_acids = Vec::new();
+    #[cfg(test)]
+    mod tests {
 
-    for codon in super::CodonIterator::new(rna) {
-        let amino_acid = match codon {
-            "UUU" | "UUC" => Phenyalalanine,
-            "UUA" | "UUG" | "CUU" | "CUC" | "CUA" | "CUG" => Leucine,
-            "AUU" | "AUC" | "AUA" => Isoleucine,
-            "AUG" => Methionine,
-            "GUU" | "GUC" | "GUA" | "GUG" => Valine,
-            "UCU" | "UCC" | "UCA" | "UCG" => Serine,
-            "CCU" | "CCC" | "CCA" | "CCG" => Proline,
-            "ACU" | "ACC" | "ACA" | "ACG" => Threonine,
-            "GCU" | "GCC" | "GCA" | "GCG" => Alanine,
-            "UAU" | "UAC" => Tyrosine,
-            "CAU" | "CAC" => Histidine,
-            "CAA" | "CAG" => Glutamine,
-            "AAU" | "AAC" => Asparagine,
-            "AAA" | "AAG" => Lysine,
-            "GAU" | "GAC" => AsparticAcid,
-            "GAA" | "GAG" => GlutamicAcid,
-            "UGU" | "UGC" => Cysteine,
-            "UGG" => Tryptophan,
-            "CGU" | "CGC" | "CGA" | "CGG" => Arginine,
-            "AGU" | "AGC" => Serine,
-            "AGA" | "AGG" => Arginine,
-            "GGU" | "GGC" | "GGA" | "GGG" => Glycine,
-            "UAA" | "UAG" | "UGA" => {
-                // STOP codons, they don't code for any amino acid
-                continue;
-            }
-            _ => {
-                return Err(format!("No amino acid matching codon {}!", codon));
-            }
-        };
+        #[test]
+        fn amino_acids_from_rna_sequence() {
+            use std::convert::TryFrom;
 
-        amino_acids.push(amino_acid);
-    }
+            let rna = ::rna::Sequence::try_from(
+                "AUGGCCAUGGCGCCCAGAACUGAGAUCAAUAGUACCCGUAUUAACGGGUGA",
+            ).unwrap();
 
-    Ok(amino_acids)
-}
+            let aas = super::Sequence::from(&rna);
 
-pub struct AminoAcidString<'a>(pub &'a Vec<AminoAcid>);
-
-// to be able to easily display a Vec<AminoAcid>
-impl<'a> fmt::Display for AminoAcidString<'a> {
-    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
-        for amino_acid in self.0 {
-            write!(f, "{}", amino_acid)?;
+            assert_eq!(aas.to_string(), "MAMAPRTEINSTRING");
         }
-
-        Ok(())
     }
+
+    #[derive(Debug, Eq, PartialOrd, Ord, PartialEq)]
+    pub struct Sequence(pub Vec<AminoAcid>);
+
+    use std::{convert, fmt};
+    use super::AminoAcid;
+    use super::RnaSequence;
+
+    // to be able to easily display a Vec<AminoAcid>
+    impl fmt::Display for Sequence {
+        fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+            for amino_acid in &self.0 {
+                write!(f, "{}", amino_acid)?;
+            }
+
+            Ok(())
+        }
+    }
+
+    #[derive(Debug, PartialEq)]
+    pub enum ParseError {
+        AminoAcidError {
+            index: usize,
+            error: super::ParseError,
+        },
+    }
+
+    impl<'a> convert::TryFrom<&'a str> for Sequence {
+        type Error = ParseError;
+
+        /// Tries to parse a &str to a sequence of amino acids.
+        ///
+        /// # Examples
+        ///
+        /// ```
+        /// use std::convert::TryFrom;
+        ///
+        /// let aas = rosalind::amino_acids::Sequence::try_from("MTPRLGLESLLE").unwrap();
+        /// ```
+        fn try_from(value: &str) -> Result<Self, Self::Error> {
+            let mut sequence = Vec::new();
+
+            for (index, aa_char) in value.chars().enumerate() {
+                let aa = match AminoAcid::try_from(aa_char) {
+                    Ok(aa) => aa,
+                    Err(error) => {
+                        return Err(ParseError::AminoAcidError {
+                            index: index,
+                            error: error,
+                        });
+                    }
+                };
+
+                sequence.push(aa);
+            }
+
+            Ok(Sequence(sequence))
+        }
+    }
+
+    impl<'a> convert::From<&'a RnaSequence> for Sequence {
+        /// Converts a RNA sequence to an amino acid sequence.
+        ///
+        /// # Examples
+        ///
+        /// ```
+        /// use std::convert::TryFrom;
+        ///
+        /// let rna_sequence = rosalind::rna::Sequence::try_from("UUAAGCGAU").unwrap();
+        /// let amino_acids = rosalind::amino_acids::Sequence::from(&rna_sequence);
+        ///
+        /// println!("{}", amino_acids);
+        /// ```
+        fn from(rna: &RnaSequence) -> Self {
+            use self::AminoAcid::*;
+            use rna::frequent_codons::*;
+
+            let mut amino_acids = Vec::new();
+
+            for codon in ::rna::sequence::StrictCodonIterator::new(rna) {
+                let amino_acid = match codon {
+                    UUU | UUC => Phenyalalanine,
+                    UUA | UUG | CUU | CUC | CUA | CUG => Leucine,
+                    AUU | AUC | AUA => Isoleucine,
+                    AUG => Methionine,
+                    GUU | GUC | GUA | GUG => Valine,
+                    UCU | UCC | UCA | UCG => Serine,
+                    CCU | CCC | CCA | CCG => Proline,
+                    ACU | ACC | ACA | ACG => Threonine,
+                    GCU | GCC | GCA | GCG => Alanine,
+                    UAU | UAC => Tyrosine,
+                    CAU | CAC => Histidine,
+                    CAA | CAG => Glutamine,
+                    AAU | AAC => Asparagine,
+                    AAA | AAG => Lysine,
+                    GAU | GAC => AsparticAcid,
+                    GAA | GAG => GlutamicAcid,
+                    UGU | UGC => Cysteine,
+                    UGG => Tryptophan,
+                    CGU | CGC | CGA | CGG => Arginine,
+                    AGU | AGC => Serine,
+                    AGA | AGG => Arginine,
+                    GGU | GGC | GGA | GGG => Glycine,
+                    UAA | UAG | UGA => {
+                        // STOP codons, they don't code for any amino acid
+                        continue;
+                    }
+                    _ => {
+                        // this can never happen as we cover every possible case
+                        panic!("No matching codon! {:?}", codon);
+                    }
+                };
+
+                amino_acids.push(amino_acid);
+            }
+
+            Sequence(amino_acids)
+        }
+    }
+
 }

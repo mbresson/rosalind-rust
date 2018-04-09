@@ -2,33 +2,18 @@ extern crate rosalind;
 
 // solution to http://rosalind.info/problems/prot/
 
-#[cfg(test)]
-mod tests {
-    extern crate rosalind;
-
-    #[test]
-    fn amino_acids_from_rna() {
-        let rna = "AUGGCCAUGGCGCCCAGAACUGAGAUCAAUAGUACCCGUAUUAACGGGUGA";
-
-        let aas = rosalind::amino_acids::amino_acids_from_rna(&rna)
-            .expect("Couldn't translate RNA to AA!");
-
-        let aas_string = aas.iter().map(|acid| acid.to_string()).collect::<String>();
-
-        assert_eq!(aas_string, "MAMAPRTEINSTRING");
-    }
-}
+use std::convert::TryFrom;
+use rosalind::{amino_acids::Sequence as AaSequence, rna::Sequence as RnaSequence};
 
 fn main() {
-    let messenger_rna = rosalind::io::load_data(file!()).expect("Couldn't open the file");
+    let rna_string = rosalind::io::load_data(file!()).expect("Couldn't open the file");
 
-    println!("RNA string: {}", messenger_rna);
+    let rna: RnaSequence =
+        RnaSequence::try_from(rna_string.as_str()).expect("Couldn't parse the sequence");
 
-    let amino_acids = rosalind::amino_acids::amino_acids_from_rna(&messenger_rna)
-        .expect("Error translating mRNA into amino acids!");
+    println!("RNA string: {}", rna);
 
-    println!(
-        "AA string: {}",
-        rosalind::amino_acids::AminoAcidString(&amino_acids)
-    );
+    let amino_acids = AaSequence::from(&rna);
+
+    println!("AA string: {}", amino_acids);
 }

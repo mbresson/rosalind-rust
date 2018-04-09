@@ -1,7 +1,5 @@
 extern crate rosalind;
 
-use std::fmt;
-
 // solution to http://rosalind.info/problems/perm/
 
 #[cfg(test)]
@@ -94,25 +92,6 @@ fn compute_permutations(n: u32) -> Vec<Vec<u32>> {
     }
 }
 
-struct Array<'a, T: 'a + fmt::Display>(pub &'a Vec<T>);
-
-impl<'a, T> fmt::Display for Array<'a, T>
-where
-    T: fmt::Display,
-{
-    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
-        for (index, item) in self.0.iter().enumerate() {
-            if index == 0 {
-                write!(f, "{}", item)?;
-            } else {
-                write!(f, " {}", item)?;
-            }
-        }
-
-        Ok(())
-    }
-}
-
 fn main() {
     let n = rosalind::io::load_data(file!())
         .expect("Couldn't open the file")
@@ -124,6 +103,12 @@ fn main() {
     println!("{}", permutations.len());
 
     for permutation in permutations {
-        println!("{}", Array(&permutation));
+        for (index, item) in permutation.iter().enumerate() {
+            if index == 0 {
+                print!("{}", item);
+            } else {
+                print!(" {}", item);
+            }
+        }
     }
 }

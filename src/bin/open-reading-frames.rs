@@ -6,7 +6,7 @@ use std::convert::TryFrom;
 use std::iter::FromIterator;
 
 use rosalind::dna::Sequence as DnaSequence;
-use rosalind::rna::{frequent_codons, Nucleobase as RnaNucleobase, Sequence as RnaSequence,
+use rosalind::rna::{codons, Nucleobase as RnaNucleobase, Sequence as RnaSequence,
                     StrictCodonIterator};
 use rosalind::amino_acids::Sequence as AaSequence;
 
@@ -39,7 +39,7 @@ mod tests {
 }
 
 fn is_stop_codon(codon: &[RnaNucleobase]) -> bool {
-    use frequent_codons::*;
+    use codons::*;
 
     match codon {
         UAA | UAG | UGA => true,
@@ -47,7 +47,7 @@ fn is_stop_codon(codon: &[RnaNucleobase]) -> bool {
     }
 }
 
-const RNA_START_CODON: &[RnaNucleobase] = frequent_codons::AUG;
+const RNA_START_CODON: &[RnaNucleobase] = codons::AUG;
 
 fn find_candidate_protein_strings_in_codons_sequence(
     codons: Vec<&[RnaNucleobase]>,
@@ -96,26 +96,7 @@ fn find_all_candidate_protein_strings(
         StrictCodonIterator::new_starting_from(&rna_reverse_complement, 0).collect(),
         StrictCodonIterator::new_starting_from(&rna_reverse_complement, 1).collect(),
         StrictCodonIterator::new_starting_from(&rna_reverse_complement, 2).collect(),
-        /*
-        rosalind::CodonIterator::new(&rna).collect(),
-        rosalind::CodonIterator::new(&rna[1..]).collect(),
-        rosalind::CodonIterator::new(&rna[2..]).collect(),
-        rosalind::CodonIterator::new(&rna_reverse_complement).collect(),
-        rosalind::CodonIterator::new(&rna_reverse_complement[1..]).collect(),
-        rosalind::CodonIterator::new(&rna_reverse_complement[2..]).collect(),
-*/
     ];
-
-    /*
-    let codons_sequences = vec![
-        rosalind::CodonIterator::new(&rna).collect(),
-        rosalind::CodonIterator::new(&rna[1..]).collect(),
-        rosalind::CodonIterator::new(&rna[2..]).collect(),
-        rosalind::CodonIterator::new(&rna_reverse_complement).collect(),
-        rosalind::CodonIterator::new(&rna_reverse_complement[1..]).collect(),
-        rosalind::CodonIterator::new(&rna_reverse_complement[2..]).collect(),
-    ];
-     */
 
     let mut candidates = Vec::new();
 

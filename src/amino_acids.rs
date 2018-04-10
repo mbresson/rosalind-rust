@@ -223,7 +223,7 @@ mod sequence {
         /// ```
         fn from(rna: &RnaSequence) -> Self {
             use self::AminoAcid::*;
-            use rna::frequent_codons::*;
+            use rna::codons::*;
 
             let mut amino_acids = Vec::new();
 

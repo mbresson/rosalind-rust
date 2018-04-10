@@ -383,7 +383,7 @@ pub mod sequence {
     }
 }
 
-pub mod frequent_codons {
+pub mod codons {
     use super::{Nucleobase, Nucleobase::*};
 
     // it would be more correct to define Codon as [Nucleobase; 3] as a RNA codon is always 3-nucleobase long

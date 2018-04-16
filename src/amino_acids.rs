@@ -28,6 +28,35 @@ pub enum AminoAcid {
     Valine,
 }
 
+impl AminoAcid {
+    pub fn monoisotopic_mass(self) -> f64 {
+        use self::AminoAcid::*;
+
+        match self {
+            Alanine => 71.03711,
+            Arginine => 156.10111,
+            Asparagine => 114.04293,
+            AsparticAcid => 115.02694,
+            Cysteine => 103.00919,
+            GlutamicAcid => 129.04259,
+            Glutamine => 128.05858,
+            Glycine => 57.02146,
+            Histidine => 137.05891,
+            Isoleucine => 113.08406,
+            Leucine => 113.08406,
+            Lysine => 128.09496,
+            Methionine => 131.04049,
+            Phenyalalanine => 147.06841,
+            Proline => 97.05276,
+            Serine => 87.03203,
+            Threonine => 101.04768,
+            Tryptophan => 186.07931,
+            Tyrosine => 163.06333,
+            Valine => 99.06841,
+        }
+    }
+}
+
 #[derive(Debug, PartialEq)]
 pub enum ParseError {
     IllegalChar { ch: char },

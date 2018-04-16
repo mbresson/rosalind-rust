@@ -286,6 +286,12 @@ pub mod sequence {
         }
     }
 
+    impl convert::AsRef<[Nucleobase]> for Sequence {
+        fn as_ref(&self) -> &[Nucleobase] {
+            self.0.as_ref()
+        }
+    }
+
     #[derive(Debug, PartialEq)]
     pub enum ParseError {
         NucleobaseError {

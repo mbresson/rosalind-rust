@@ -130,7 +130,7 @@ impl fmt::Display for AminoAcid {
     }
 }
 
-mod sequence {
+pub mod sequence {
 
     #[cfg(test)]
     mod tests {
@@ -149,12 +149,18 @@ mod sequence {
         }
     }
 
+    use std::{convert, fmt, ops};
+    use super::AminoAcid;
+    use super::RnaSequence;
+
     #[derive(Debug, Eq, PartialOrd, Ord, PartialEq)]
     pub struct Sequence(pub Vec<AminoAcid>);
 
-    use std::{convert, fmt};
-    use super::AminoAcid;
-    use super::RnaSequence;
+    impl Sequence {
+        pub fn len(&self) -> usize {
+            self.0.len()
+        }
+    }
 
     // to be able to easily display a Vec<AminoAcid>
     impl fmt::Display for Sequence {
@@ -164,6 +170,14 @@ mod sequence {
             }
 
             Ok(())
+        }
+    }
+
+    impl ops::Index<usize> for Sequence {
+        type Output = AminoAcid;
+
+        fn index(&self, index: usize) -> &AminoAcid {
+            &self.0[index]
         }
     }
 
@@ -265,6 +279,28 @@ mod sequence {
             }
 
             Sequence(amino_acids)
+        }
+    }
+
+    /// Cloning iterator over a sequence's amino acids.
+    ///
+    /// # Examples
+    ///
+    /// ```
+    /// use std::convert::TryFrom;
+    ///
+    /// let sequence = rosalind::amino_acids::Sequence::try_from("MTPRLGLESLLE").unwrap();
+    ///
+    /// for aa in &sequence {
+    ///     println!("{}", aa);
+    /// }
+    /// ```
+    impl<'a> IntoIterator for &'a Sequence {
+        type Item = AminoAcid;
+        type IntoIter = ::std::iter::Cloned<::std::slice::Iter<'a, AminoAcid>>;
+
+        fn into_iter(self) -> Self::IntoIter {
+            self.0.iter().cloned()
         }
     }
 

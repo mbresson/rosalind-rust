@@ -2,16 +2,14 @@ extern crate reqwest;
 extern crate rosalind;
 
 use std::convert::TryFrom;
-use std::error::Error;
-use rosalind::amino_acids;
-use rosalind::amino_acids::AminoAcid;
+use rosalind::amino_acids::{sequence, AminoAcid, Sequence};
 
 // solution to http://rosalind.info/problems/mprt/
 
 #[cfg(test)]
 mod tests {
     use std::convert::TryFrom;
-    use rosalind::amino_acids::AminoAcid;
+    use rosalind::amino_acids::Sequence;
 
     #[test]
     fn find_all_n_glycosylation_motif_positions_in_protein() {
@@ -19,12 +17,9 @@ mod tests {
                               HGKWPENNTSAGVASPPSDIKGKYVKEVEVKNGVVTATMLSSGVNNEIKGKKLSLWARRE\
                               NGSVKWFCGQPVTRTDDDTVADAKDGKEIDTKHLPSTCRDNFDAK";
 
-        let protein = protein_string
-            .chars()
-            .map(|ch| AminoAcid::try_from(ch).unwrap())
-            .collect();
+        let sequence = Sequence::try_from(protein_string).unwrap();
 
-        let positions = ::find_all_n_glycosylation_motif_positions_in_protein(protein);
+        let positions = ::find_all_n_glycosylation_motif_positions_in_protein(&sequence);
 
         assert_eq!(positions, vec![66, 67, 120]);
     }
@@ -34,7 +29,7 @@ mod tests {
 #[derive(Debug)]
 enum UniprotError {
     RequestError(reqwest::Error),
-    DataError(String),
+    ParseError(sequence::ParseError),
 }
 
 impl From<reqwest::Error> for UniprotError {
@@ -43,21 +38,13 @@ impl From<reqwest::Error> for UniprotError {
     }
 }
 
-// it'd be better to have a specific error type instead of just an error String, but this is just a bioinformatics exercise and not a library
-impl From<String> for UniprotError {
-    fn from(errmsg: String) -> UniprotError {
-        UniprotError::DataError(errmsg)
+impl From<sequence::ParseError> for UniprotError {
+    fn from(err: sequence::ParseError) -> UniprotError {
+        UniprotError::ParseError(err)
     }
 }
 
-impl From<amino_acids::ParseError> for UniprotError {
-    fn from(parse_err: amino_acids::ParseError) -> UniprotError {
-        // this is hackish, in a real program, it'd be better to have a more detailed ParseError type and not clone its description
-        UniprotError::DataError(parse_err.description().to_string())
-    }
-}
-
-fn download_protein_from_uniprot(protein_id: &str) -> Result<Vec<AminoAcid>, UniprotError> {
+fn download_protein_from_uniprot(protein_id: &str) -> Result<Sequence, UniprotError> {
     let fasta_url = format!("https://www.uniprot.org/uniprot/{}.fasta", protein_id);
 
     let raw_data = reqwest::get(&fasta_url)?.text()?;
@@ -66,26 +53,16 @@ fn download_protein_from_uniprot(protein_id: &str) -> Result<Vec<AminoAcid>, Uni
 
     protein_lines.next(); // the first line is the sequence label, we don't need it
 
-    let mut protein_sequence = String::new();
+    let mut protein_str = String::new();
 
     for protein_line in protein_lines {
-        protein_sequence.push_str(protein_line);
+        protein_str.push_str(protein_line);
     }
 
-    if protein_sequence.len() == 0 {
-        Err(UniprotError::DataError(format!(
-            "Empty sequence for protein ID {}!",
-            protein_id
-        )))
-    } else {
-        Ok(protein_sequence
-            .chars()
-            .map(|ch| AminoAcid::try_from(ch))
-            .collect::<Result<Vec<AminoAcid>, _>>()?)
-    }
+    Ok(Sequence::try_from(protein_str.as_str())?)
 }
 
-fn find_all_n_glycosylation_motif_positions_in_protein(protein: Vec<AminoAcid>) -> Vec<usize> {
+fn find_all_n_glycosylation_motif_positions_in_protein(protein: &Sequence) -> Vec<usize> {
     use AminoAcid::{Asparagine, Proline, Serine, Threonine};
 
     let mut positions = Vec::new();
@@ -98,7 +75,7 @@ fn find_all_n_glycosylation_motif_positions_in_protein(protein: Vec<AminoAcid>) 
     // 1 "any amino acid except Proline (P)"
     // the complete motif is 4-amino-acid long
 
-    for (index, aa_1) in protein.iter().enumerate() {
+    for (index, aa_1) in protein.into_iter().enumerate() {
         if index + 4 >= protein.len() {
             break;
         }
@@ -107,7 +84,7 @@ fn find_all_n_glycosylation_motif_positions_in_protein(protein: Vec<AminoAcid>) 
         let aa_3 = &protein[index + 2];
         let aa_4 = &protein[index + 3];
 
-        if *aa_1 == Asparagine && *aa_2 != Proline && (*aa_3 == Serine || *aa_3 == Threonine)
+        if aa_1 == Asparagine && *aa_2 != Proline && (*aa_3 == Serine || *aa_3 == Threonine)
             && *aa_4 != Proline
         {
             positions.push(index);
@@ -129,7 +106,7 @@ fn main() {
             }
         };
 
-        let motif_positions = find_all_n_glycosylation_motif_positions_in_protein(protein);
+        let motif_positions = find_all_n_glycosylation_motif_positions_in_protein(&protein);
 
         if motif_positions.len() > 0 {
             println!("{}", uniprot_protein_id);

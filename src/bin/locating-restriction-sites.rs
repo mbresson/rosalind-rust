@@ -60,27 +60,15 @@ fn find_reverse_palindromes_of_length_between_4_and_12(
 
     let reverse_complement = sequence.reverse_complement();
 
-    /*
-     * why as_ref()?
-     * this is a small trick: we cannot directly index a range on a dna::Sequence (e.g. do something like sequence[x..y]),
-     * unless we impl ops::Index<ops::Range<usize>> for Sequence, but it's quite a hassle.
-     *
-     * dna::Sequence is a newtype with a private field and we want to keep it this way, forbidding direct manipulation over its content
-     * so here is another way to indexing a range on its content: by providing an immutable ref to its underlying content,
-     * and we do that with as_ref().
-     */
-    let range_indexable_sequence = sequence.as_ref();
-    let range_indexable_reverse_complement = reverse_complement.as_ref();
-
     for (index, _nucleobase) in sequence.into_iter().enumerate() {
         for subsequence_length in 4..13 {
             if index + subsequence_length > sequence.len() {
                 break;
             }
 
-            let subsequence = &range_indexable_sequence[index..index + subsequence_length];
+            let subsequence = &sequence[index..index + subsequence_length];
 
-            let reverse_complement_subsequence = &range_indexable_reverse_complement
+            let reverse_complement_subsequence = &reverse_complement
                 [sequence.len() - (index + subsequence_length)..sequence.len() - index];
 
             if subsequence == reverse_complement_subsequence {

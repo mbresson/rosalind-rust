@@ -196,7 +196,7 @@ pub mod sequence {
         }
     }
 
-    use std::{convert, fmt};
+    use std::{convert, fmt, ops};
     use super::Nucleobase;
 
     #[derive(Debug, PartialEq)]
@@ -286,9 +286,20 @@ pub mod sequence {
         }
     }
 
-    impl convert::AsRef<[Nucleobase]> for Sequence {
-        fn as_ref(&self) -> &[Nucleobase] {
-            self.0.as_ref()
+    /// ```
+    /// use std::convert::TryFrom;
+    ///
+    /// let sequence = rosalind::dna::Sequence::try_from("TTACGGGCAT").unwrap();
+    ///
+    /// let subsequence = &sequence[0..3];
+    /// println!("{:?}", subsequence);
+    /// ```
+    impl ops::Index<ops::Range<usize>> for Sequence {
+        type Output = [Nucleobase];
+
+        #[inline]
+        fn index(&self, index: ops::Range<usize>) -> &[Nucleobase] {
+            &self.0[index]
         }
     }
 

@@ -25,12 +25,12 @@ mod tests {
     }
 
     #[test]
-    fn factorial() {
-        assert_eq!(::factorial(0), 1.to_biguint().unwrap());
-        assert_eq!(::factorial(1), 1.to_biguint().unwrap());
-        assert_eq!(::factorial(2), 2.to_biguint().unwrap());
-        assert_eq!(::factorial(3), 6.to_biguint().unwrap());
-        assert_eq!(::factorial(10), 3628800.to_biguint().unwrap());
+    fn big_factorial() {
+        assert_eq!(::big_factorial(0), 1.to_biguint().unwrap());
+        assert_eq!(::big_factorial(1), 1.to_biguint().unwrap());
+        assert_eq!(::big_factorial(2), 2.to_biguint().unwrap());
+        assert_eq!(::big_factorial(3), 6.to_biguint().unwrap());
+        assert_eq!(::big_factorial(10), 3628800.to_biguint().unwrap());
     }
 }
 
@@ -55,14 +55,14 @@ fn probability_at_least_n_successful_organisms_in_generation_k(
 }
 
 fn compute_n_choose_k(n: u32, k: u32) -> f64 {
-    let factorial_k = factorial(k).to_f64().unwrap();
-    let factorial_n = factorial(n).to_f64().unwrap();
-    let factorial_k_minus_n = factorial(k - n).to_f64().unwrap();
+    let factorial_k = big_factorial(k).to_f64().unwrap();
+    let factorial_n = big_factorial(n).to_f64().unwrap();
+    let factorial_k_minus_n = big_factorial(k - n).to_f64().unwrap();
 
     factorial_k / (factorial_n * factorial_k_minus_n)
 }
 
-fn factorial(n: u32) -> BigUint {
+fn big_factorial(n: u32) -> BigUint {
     if n == 0 {
         return 1.to_biguint().unwrap();
     }
